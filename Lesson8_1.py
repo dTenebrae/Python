@@ -104,7 +104,8 @@ class Game:
 
     @property
     def get_barrel(self):
-        return self.barrel_list.pop(randrange(len(self.barrel_list)))
+        while self.barrel_list:
+            yield self.barrel_list.pop(randrange(len(self.barrel_list)))
 
     @property
     def barrels_left(self):
@@ -115,16 +116,13 @@ game_lost = False
 player1 = Players('Vasiliy')
 player2 = Players()
 new_game = Game()
-while True:
-    current_barrel = new_game.get_barrel
-    print(f'\nНовый бочонок: {current_barrel} '
-          f'(осталось {new_game.barrels_left})\n')
+for barrel in new_game.get_barrel:
+    print(f'\nНовый бочонок: {barrel} (осталось {new_game.barrels_left})\n')
     print(player1.show_card)
     print(player2.show_card)
-
     for player in [player1, player2]:
         if player.cpu:
-            player.check_list(current_barrel, True)
+            player.check_list(barrel, True)
         else:
             while True:
                 pressed_key = input('\nЗачеркнуть цифру? (y/n)')
@@ -133,10 +131,9 @@ while True:
                 else:
                     break
             if pressed_key == 'y':
-                if not (player.check_list(current_barrel, True)):
+                if not (player.check_list(barrel, True)):
                     game_lost = True
-            elif pressed_key == 'n' and player.check_list(current_barrel,
-                                                          False):
+            elif pressed_key == 'n' and player.check_list(barrel, False):
                 game_lost = True
         if game_lost:
             print('Вы проиграли')
